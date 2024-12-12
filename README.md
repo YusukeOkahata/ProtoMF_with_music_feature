@@ -1,8 +1,6 @@
 # ProtoMF: Prototype-based Matrix Factorization for Effective and Explainable Recommendations
 
-This repository hosts the code and the additional materials for the paper "ProtoMF: Prototype-based Matrix Factorization
-for Effective and Explainable Recommendations" by [Alessandro B. Melchiorre](https://karapostk.github.io/), Navid
-Rekabsaz, Christian Ganhör, and Markus Schedl at RecSys 2022.
+このリポジトリには、RecSys 2022で発表された論文「ProtoMF: Prototype-based Matrix Factorization for Effective and Explainable Recommendations」（著者： Alessandro B. Melchiorre、Navid Rekabsaz、Christian Ganhör、Markus Schedl）のコードおよび追加資料が含まれています。
 
 ![ProtoMF Diagram](./pdfs_and_images/3-protomf_models_schema.png "ProtoMF Diagram")
 
@@ -21,12 +19,12 @@ Rekabsaz, Christian Ganhör, and Markus Schedl at RecSys 2022.
 ```
 
 ## Repository Structure
+このコードはPythonで書かれており、[Pytorch](https://pytorch.org/) を使用してモデルの勾配を計算します。また、[ray tune](https://www.ray.io/ray-tune) を用いたハイパーパラメータ最適化や、[weight and biases](https://wandb.ai/)を用いたログ記録など、多くの便利なパッケージを活用しています。
 
-The code is written in Python and relies on [Pytorch](https://pytorch.org/) to compute the model's gradients. We further
-use [ray tune](https://www.ray.io/ray-tune) for hyperparameter optimization and [weight and biases](https://wandb.ai/)
-for logging, among many cool packages.
+**Code**は以下のように構成され、それぞれ簡単に説明されています。
 
-**Code** is structured in the following way and briefly described below:
+
+
 
 ```bash
 .
@@ -62,67 +60,61 @@ for logging, among many cool packages.
     └── utils.py
 ```
 
-where the files/directories contain:
+ファイルおよびディレクトリの役割は以下の通りです：
 
-- `protomf.yml`: environment (install with `conda env create -f protomf.yml`)
-- `start.py`: starting point to run the experiments (check with `python start.py --help`)
-- `experiment_helper.py`: hyperparameter optimization procedure
-- `confs/hyper_params.py`: hyperparameters of all the models
-- `data/*`: data folder and data splitting procedure
-- `feature_extraction/*`: code of the models
-- `rec_sys/protomf_dataset.py`: general code for handling the dataset (including negative sampling)
-- `rec_sys/rec_sys.py`: a general recommender system, used as base for all models
-- `rec_sys/tester.py` and `rec_sys/trainer.py`: testing and training procedure respectively
-- `utilities/*`: constants, evaluation metrics code, generic code
+- `start.py`: 実験の起点となるスクリプト(`python start.py --help`)
+- `experiment_helper.py`: ハイパーパラメータ最適化処理
+- `confs/hyper_params.py`: 各モデルのハイパーパラメータ
+- `data/*`: データフォルダおよびデータ分割コード
+- `feature_extraction/*`: モデルに関連するコード
+- `rec_sys/protomf_dataset.py`: データセットの処理（ネガティブサンプリングを含む）
+- `rec_sys/rec_sys.py`: すべてのモデルで使用される推薦システムコード
+- `rec_sys/tester.py` and `rec_sys/trainer.py`: テストおよびトレーニング
+- `utilities/*`: 定数、評価指標、汎用コード
 
-## Installation and configuration
+## インストールおよび設定
 
-### Environment
+### 環境構築
 
-- Install the environment with
-  `conda env create -f protomf.yml`
-- Activate the environment with `conda activate protomf`
+- `ProtoMF_github.ipynb`を実行すれば環境構築ができます。依存関係の競合が起こりますが、実行に支障はないです。
 
-### Data
+### データ
+`./data/README.md`に記載された手順に従い、3つのデータセットをすべてダウンロードしてください。データセットのファイルを適切なフォルダに配置し、それぞれのsplitter.pyファイルを使用してデータセットを前処理します。
+データを前処理するには、通常以下を実行します：
 
-Follow the instructions to download all three datasets in `./data/README.md`. Place the datasets files in the right
-folders and use the respective splitter.py files to pre-process the datasets.
-To pre-process the data, generally you just need to
+- 該当フォルダに移動します：`cd <dataset_folder>`
+- 次のコマンドを実行します：
+`python <dataset_name>_splitter.py -lh <folder_where_the_data_is>`
+（データがすでにそのフォルダにある場合、通常`./`で十分です）
+スクリプトの実行後、以下の5つのファイルが生成されます：
 
-- move into the folder with `cd <dataset_folder>`
-- run `python <dataset_name>_splitter.py -lh <folder_where_the_data_is>` (usually the data is already in the folder
-  so `./` will suffice). Leave the saving path to `./`.
+- ユーザーのリスニング履歴（train、val、test用）の3つのファイル
+- レーティング行列のインデックスとして機能するユーザーおよびアイテムIDを含む2つのファイル
 
-After the scripts finish running you will have 5 files:
 
-- 3 files with the listening_history of the users for train, val, and test
-- 2 files containing the user and item ids (as index in the rating matrix)
 
-### Configuration
+### 設定
 
-In `utilities/consts.py` you need to set:
+`utilities/consts.py`で以下を設定する必要があります：
 
-- `DATA_PATH`: absolute path to the `./data` folder
-- `WANDB_API_KEY`: API key of Weight and Biases, currently the results are only printed there.
+- `DATA_PATH`: `./data`フォルダへの絶対パス
+- `WANDB_API_KEY`: Weight and BiasesのAPIキー（詳細の結果は現在ここにのみ記録されます）
+
 
 ## Run
 
-The experiments can be started with
+実験は以下のコマンドで開始できます：
 
 `python start.py -m <model> -d <dataset>`
 
-For checking the options for model and dataset, use
+モデルおよびデータセットの選択肢を確認するには以下を使用してください：
 
 `python start.py --help`
 
-By default, `python start.py` runs the hyperparameter optimization for a single seed (check `utilities/consts.py`).
-If the flag `-mp` is provided together with the model and dataset, then the script will run all three hyperparameter
-optimization procedures and average the test results.
+デフォルトでは、`python start.py`は単一のシードでハイパーパラメータ最適化を実行します（詳細は`utilities/consts.py`を参照）。
+`-mp`フラグをモデルおよびデータセットと共に指定すると、3回のハイパーパラメータ最適化を実行し、テスト結果を平均化します。
 
-Results and progress can be checked on the Weight&Biases webpage.
+結果および進捗はWeight & Biasesのウェブページで確認可能です。
 
-## License 
-The code in this repository is licensed under the Apache 2.0 License. For details, please see the LICENSE file.
-## Acknowledgments
-
-This work received financial support by the Austrian Science Fund (FWF): P33526 and DFH-23; and by the State of Upper Austria and the Federal Ministry of Education, Science, and Research, through grant LIT-2020-9-SEE-113 and LIT-2021-YOU-215.
+## ライセンス
+このリポジトリ内のコードはApache 2.0ライセンスの下で提供されています。詳細はLICENSEファイルをご覧ください。
