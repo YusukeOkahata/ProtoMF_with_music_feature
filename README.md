@@ -34,11 +34,13 @@
 │   ├── amazon2014
 │   │   └── amazon2014_splitter.py
 │   ├── lfm2b-1mon
-│   │   └── lfm2b-2020_splitter.py
+│   │   ├── lfm2b-2020_splitter.py
+│   │   └── lfm2b-2020_splitter_reduce_ver.py
 │   ├── ml-1m
 │   │   └── movielens_splitter.py
 │   └── README.md
 ├── experiment_helper.py
+├── explanations_util.ipynb
 ├── feature_extraction
 │   ├── feature_extractor_factories.py
 │   └── feature_extractors.py
@@ -46,7 +48,6 @@
 │   ├── protomf_appendix.pdf
 │   ├── protomf_diagram.png
 │   └── ProtoMF__Prototype_based_Matrix_Factorization.pdf
-├── protomf.yml
 ├── README.md
 ├── rec_sys
 │   ├── protomf_dataset.py
@@ -64,6 +65,7 @@
 
 - `start.py`: 実験の起点となるスクリプト(`python start.py --help`)
 - `experiment_helper.py`: ハイパーパラメータ最適化処理
+- `explanations_util.ipynb`:推薦過程の可視化など説明性に関するコード
 - `confs/hyper_params.py`: 各モデルのハイパーパラメータ
 - `data/*`: データフォルダおよびデータ分割コード
 - `feature_extraction/*`: モデルに関連するコード
@@ -115,6 +117,11 @@
 `-mp`フラグをモデルおよびデータセットと共に指定すると、3回のハイパーパラメータ最適化を実行し、テスト結果を平均化します。
 
 結果および進捗はWeight & Biasesのウェブページで確認可能です。
+
+## 推薦説明
+
+推薦過程の可視化など、説明性に関しては以下のファイルの中身に従って実行してください：
+`explanations_util.ipynb`
 
 ## ライセンス
 このリポジトリ内のコードはApache 2.0ライセンスの下で提供されています。詳細はLICENSEファイルをご覧ください。
