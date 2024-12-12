@@ -1,20 +1,20 @@
 # ProtoMF: Prototype-based Matrix Factorization for Effective and Explainable Recommendations
 
-このリポジトリには、RecSys 2022で発表された論文「ProtoMF: Prototype-based Matrix Factorization for Effective and Explainable Recommendations」（著者： Alessandro B. Melchiorre、Navid Rekabsaz、Christian Ganhör、Markus Schedl）のコードおよび追加資料が含まれています。
+このリポジトリには、「ProtoMFを用いた音楽推薦と推薦過程の可視化」のコードおよび追加資料が含まれています。
 
 ![ProtoMF Diagram](./pdfs_and_images/3-protomf_models_schema.png "ProtoMF Diagram")
 
 ```latex
-@inproceedings{melchiorre2022protomf,
-    title = {ProtoMF: Prototype-based Matrix Factorization for Effective and Explainable Recommendations},
-    author = {Melchiorre, Alessandro B. and Rekabsaz, Navid and Ganhör, Christian and Schedl, Markus},
-    booktitle = {Sixteenth ACM Conference on Recommender Systems},
-    year = {2022},
-    publisher = {Association for Computing Machinery},
-    address = {New York, NY, USA},
-    series = {RecSys '22},
-    doi = {10.1145/3523227.3546756},
-    isbn = {978-1-4503-9278-5/22/09}
+@inproceedings{
+    title = {ProtoMFを用いた音楽推薦と推薦過程の可視化},
+    author = {Yusuke Okahata, Yusuke Shimizu, Keiko Ono},
+    booktitle = {},
+    year = {2025},
+    publisher = {},
+    address = {Kyoto,Japan},
+    series = {},
+    doi = {},
+    isbn = {}
 }
 ```
 
