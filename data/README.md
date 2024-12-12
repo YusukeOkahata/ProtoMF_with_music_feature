@@ -1,17 +1,18 @@
 # Link to the datasets 
 
 ## MovieLens-1M
-Download the file 'ratings.dat' from 
+以下のリンクから'ratings.dat'をダウンロードしてください：
 > https://grouplens.org/datasets/movielens/1m/
 
-and place it in the ml-1m folder before running movielens_splitter.py
+ダウンロード後、ファイルをml-1mフォルダに配置し、movielens_splitter.pyを実行してください。
+
 ## Amazon2014 Videogames
-Download the file 'ratings_Video_Games.csv' from 
+以下のリンクから'ratings_Video_Games.csv'をダウンロードしてください：
 > http://jmcauley.ucsd.edu/data/amazon/index_2014.html
 
-and place it in the amazon2014 folder before running amazon2014_splitter.py
+ダウンロード後、ファイルをamazon2014フォルダに配置し、amazon2014_splitter.pyを実行してください。
 ## LFM-2b 1Mon
-Download the files 'users.tsv' and 'listening_events.tsv' from the 2020 Subset tab at
-> http://www.cp.jku.at/datasets/LFM-2b/
+以下のリンクから'inter_dataset.tsv'，'tags_micro_genre.json'，'tracks.tsv'，'users.tsv'をダウンロードしてください：
+> https://drive.google.com/drive/folders/15UVDBiWJQ9KYdJFDUz2NPZ3tJuhtWKYx?usp=share_link
 
-and place them in the lfm2b-1mon folder before running lfm2b-2020_splitter.py
+ダウンロード後、これらのファイルをlfm2b-1monフォルダに配置し、lfm2b-2020_splitter.py，もしくはlfm2b-2020_splitter_reduce_ver.pyを実行してください。
