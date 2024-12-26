@@ -40,14 +40,11 @@
 │   │   └── movielens_splitter.py
 │   └── README.md
 ├── experiment_helper.py
-├── explanations_util.ipynb
 ├── feature_extraction
 │   ├── feature_extractor_factories.py
 │   └── feature_extractors.py
 ├── pdfs and images
-│   ├── protomf_appendix.pdf
-│   ├── proposed_model.png
-│   └── ProtoMF__Prototype_based_Matrix_Factorization.pdf
+│   └── proposed_model.png
 ├── README.md
 ├── rec_sys
 │   ├── protomf_dataset.py
