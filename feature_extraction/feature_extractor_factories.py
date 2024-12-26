@@ -245,12 +245,6 @@ class FeatureExtractorFactory:
             if audio_feature_path is not None and audio_feature_path.strip() != "":
                 # 新しい埋め込み層（音源特徴量を統合したもの）を作成
                 print("音源特徴を含めて実行します")
-                # model = EmbeddingWithAudioFeatures(
-                #     n_objects=n_objects, 
-                #     embedding_dim=embedding_dim, 
-                #     audio_feature_dim=audio_feature_dim,
-                #     audio_features_path=audio_feature_path
-                # )
                 model = PrototypeEmbeddingWithAudio(
                     n_objects=n_objects,
                     embedding_dim=embedding_dim,
