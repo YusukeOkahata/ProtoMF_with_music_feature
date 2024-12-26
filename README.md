@@ -2,7 +2,7 @@
 
 このリポジトリには、「ProtoMFを用いた音楽推薦と推薦過程の可視化」のコードおよび追加資料が含まれています。
 
-![ProtoMF Diagram](./pdfs_and_images/3-protomf_models_schema.png "ProtoMF Diagram")
+![ProtoMF Diagram](./pdfs_and_images/proposed_model.png "ProtoMF Diagram")
 
 ```latex
 @inproceedings{
@@ -46,7 +46,7 @@
 │   └── feature_extractors.py
 ├── pdfs and images
 │   ├── protomf_appendix.pdf
-│   ├── protomf_diagram.png
+│   ├── proposed_model.png
 │   └── ProtoMF__Prototype_based_Matrix_Factorization.pdf
 ├── README.md
 ├── rec_sys
