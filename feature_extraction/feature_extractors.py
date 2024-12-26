@@ -5,7 +5,7 @@ import torch.nn as nn
 
 from utilities.utils import general_weight_init
 
-# 追加
+
 import pandas as pd
 
 class FeatureExtractor(nn.Module, ABC):
@@ -78,75 +78,7 @@ class Embedding(FeatureExtractor):
             embeddings = torch.absolute(embeddings)
         return embeddings
 
-# class EmbeddingWithAudioFeatures(FeatureExtractor):
-#     def __init__(self, n_objects: int, embedding_dim: int, max_norm: float = None, audio_feature_dim: int = 13,
-#                  out_dimension: int = None, use_bias: bool = False, audio_features_path: str = None):
-#         super().__init__()
 
-#         self.n_objects = n_objects
-#         self.embedding_dim = embedding_dim
-#         self.max_norm = max_norm
-#         self.audio_feature_dim = audio_feature_dim
-#         self.out_dimension = out_dimension
-#         self.use_bias = use_bias
-#         self.audio_features_path = audio_features_path
-#         self.name = "EmbeddingWithAudioFeatures"
-
-#         # Embedding layer from embedding_ext (Embedding class)
-#         self.embedding_ext = Embedding(n_objects, embedding_dim, max_norm)  # Embeddingを使って初期化
-
-#         # Additional layers for audio features
-#         self.audio_feature_layer = nn.Linear(self.audio_feature_dim, self.embedding_dim)
-
-#         # Initialize audio features
-#         self.audio_features = None
-#         if self.audio_features_path is not None:
-#             try:
-#                 import pandas as pd
-#                 self.audio_features = pd.read_csv(self.audio_features_path)
-#                 print(f"Audio features loaded successfully from: {self.audio_features_path}, shape: {self.audio_features.shape}")
-#             except Exception as e:
-#                 print(f"Error loading audio features: {e}")
-#                 raise
-
-#         print(f'Built EmbeddingWithAudioFeatures model \n'
-#               f'- n_objects: {self.n_objects} \n'
-#               f'- embedding_dim: {self.embedding_dim} \n'
-#               f'- audio_feature_dim: {self.audio_feature_dim} \n'
-#               f'- out_dimension: {self.out_dimension} \n'
-#               f'- use_bias: {self.use_bias}')
-
-#     def forward(self, o_idxs: torch.Tensor, audio_features: torch.Tensor = None) -> torch.Tensor:
-#         """
-#         :param o_idxs: Object indexes
-#         :param audio_features: Audio features tensor
-#         :return: Combined embedding
-#         """
-#         # Embedding for the objects from embedding_ext
-#         embeddings = self.embedding_ext(o_idxs)  # embedding_ext (Embedding) のforwardを呼び出す
-
-#         # Process audio features if provided
-#         if audio_features is not None:
-#             audio_embeddings = self.audio_feature_layer(audio_features)
-#             embeddings += audio_embeddings  # Combine the embeddings
-
-#         return embeddings
-
-#     def _get_audio_features(self, o_idxs: torch.Tensor) -> torch.Tensor:
-#         """
-#         Get the audio features corresponding to the item indices.
-#         """
-#         if self.audio_features is None:
-#             raise ValueError("Audio features are not initialized. Check the audio_features_path.")
-
-#         try:
-#             item_ids = o_idxs.cpu().numpy().flatten()  # インデックスをフラット化
-#             audio_features = self.audio_features.iloc[item_ids].loc[:, 'feature_1':'feature_13'].values
-#             audio_features_tensor = torch.tensor(audio_features, dtype=torch.float32).to(o_idxs.device)
-#             return audio_features_tensor
-#         except Exception as e:
-#             print(f"Error fetching audio features for indices {o_idxs}: {e}")
-#             raise
 
 class EmbeddingWithAudioFeatures(FeatureExtractor):
     def __init__(self, n_objects: int, embedding_dim: int, max_norm: float = None, audio_feature_dim: int = 13,
