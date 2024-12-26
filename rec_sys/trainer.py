@@ -56,16 +56,9 @@ class Trainer:
         n_users = self.train_loader.dataset.n_users
         n_items = self.train_loader.dataset.n_items
 
-        import pandas as pd
-
-        # 音源特徴量をロード (例: audio_features.csv)
-        audio_features_df = pd.read_csv('/content/drive/MyDrive/Master/research/ProtoMF/data/lfm2b-1mon/data_with_CLMR/train_data_with_features.csv')
-        audio_features_tensor = torch.tensor(audio_features_df.iloc[:, 1:].values, dtype=torch.float32)
-        # データセットから音源特徴量を取得
-        audio_features = torch.tensor(self.train_loader.dataset.audio_features.values, dtype=torch.float32)
-
         user_feature_extractor, item_feature_extractor = \
-            FeatureExtractorFactory.create_models(self.ft_ext_param, n_users, n_items, audio_features)
+            FeatureExtractorFactory.create_models(self.ft_ext_param, n_users, n_items)
+       
         # Step 2 --- Building RecSys Module
         rec_sys = RecSys(n_users, n_items, self.rec_sys_param, user_feature_extractor, item_feature_extractor,
                          self.loss_func_name, self.loss_func_aggr)
@@ -148,6 +141,11 @@ class Trainer:
                     model_save_path = os.path.join(self.save_path, 'best_model.pth')
                     os.makedirs(self.save_path, exist_ok=True)  # 保存ディレクトリがない場合は作成
                     print(f"Saving model at: {model_save_path}")
+
+                    # モデル構造と重みを保存
+                    # torch.save(self.model.module, model_save_path)
+                    
+                    # モデルの重みのみを保存（推奨）
                     torch.save(self.model.module.state_dict(), model_save_path)
                     
                     # 保存確認

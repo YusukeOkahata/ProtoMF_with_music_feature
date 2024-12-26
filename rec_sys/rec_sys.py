@@ -101,18 +101,42 @@ class RecSys(nn.Module):
 
         # --- User pass ---
         u_embed = self.user_feature_extractor(u_idxs)
-        if self.use_bias:
-            u_bias = self.user_bias(u_idxs)
+        # print(f"u_embed shape: {u_embed.shape}")
+        u_embed = u_embed.unsqueeze(1)  # [batch_size, 1, feature_dim]
+        # print(f"u_embed shape after unsqueeze: {u_embed.shape}")
 
         # --- Item pass ---
-        if self.use_bias:
-            i_bias = self.item_bias(i_idxs).squeeze()
-
         i_embed = self.item_feature_extractor(i_idxs)
+        # print(f"i_embed shape: {i_embed.shape}")
 
-        # --- Dot Product ---
-        dots = torch.sum(u_embed.unsqueeze(1) * i_embed, dim=-1)  # [batch_size, n_neg_p_1]
+        # --- Adjust i_embed dimensions ---
+        if i_embed.size(-1) != u_embed.size(-1):
+            target_dim = u_embed.size(-1)
+            current_dim = i_embed.size(-1)
+            # print(f"Adjusting i_embed size: {current_dim} -> {target_dim}")
 
+            if current_dim > target_dim:
+                # i_embed の次元が大きい場合、切り捨て
+                i_embed = i_embed[:, :, :target_dim]
+            else:
+                # i_embed の次元が小さい場合、繰り返して次元を拡張
+                repeat_factor = (target_dim + current_dim - 1) // current_dim  # 必要な繰り返し回数
+                i_embed = i_embed.repeat(1, 1, repeat_factor)[:, :, :target_dim]
+
+            # print(f"i_embed size after adjustment: {i_embed.shape}")
+
+        # --- Debugging intermediate tensors ---
+        try:
+            product = u_embed * i_embed  # Element-wise multiplication
+            # print(f"Product shape: {product.shape}")
+            dots = torch.sum(product, dim=-1)  # Summing over feature_dim
+            # print(f"dots shape: {dots.shape}")  # Expected shape: [batch_size, n_items]
+        except RuntimeError as e:
+            print(f"Error during dot product calculation: {e}")
+            print(f"u_embed: {u_embed.shape}, i_embed: {i_embed.shape}")
+            raise
+
+        
         if self.use_bias:
             # Optional bias
             dots = dots + u_bias + i_bias + self.global_bias

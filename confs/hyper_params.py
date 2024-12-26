@@ -36,6 +36,27 @@ mf_hyper_params = {
         }
     },
 }
+
+mf_with_music_hyper_params = {
+    **base_hyper_params,
+    'loss_func_aggr': 'mean',
+    'ft_ext_param': {
+        "ft_type": "detached",
+        'embedding_dim': tune.randint(10, 100),
+        'user_ft_ext_param': {
+            "ft_type": "embedding",
+        },
+        'item_ft_ext_param': {
+            "ft_type": "embedding",
+
+            # 音源特徴を追加
+            'audio_features_path': "/content/drive/MyDrive/Master/research/ProtoMF/data/lfm2b-1mon/data_with_CLMR/train_data_with_features.csv",
+            'audio_feature_dim': 13  # 音源特徴量の次元
+        }
+    },
+}
+
+
 anchor_hyper_params = {
     **base_hyper_params,
     'loss_func_aggr': 'sum',
@@ -70,6 +91,32 @@ user_proto_chose_original_hyper_params = {
     },
 }
 
+user_proto_with_music_chose_original_hyper_params = {
+    **base_hyper_params,
+    'loss_func_aggr': 'mean',
+    'ft_ext_param': {
+        "ft_type": "prototypes",
+        'embedding_dim': tune.randint(10, 100),
+        'user_ft_ext_param': {
+            "ft_type": "prototypes",
+            'sim_proto_weight': tune.loguniform(1e-3, 10),
+            'sim_batch_weight': tune.loguniform(1e-3, 10),
+            'use_weight_matrix': False,
+            'n_prototypes': tune.randint(10, 100),
+            'cosine_type': 'shifted',
+            'reg_proto_type': 'max',
+            'reg_batch_type': 'max',
+        },
+        'item_ft_ext_param': {
+            "ft_type": "embedding",
+
+            # 音源特徴を追加
+            'audio_features_path': "/content/drive/MyDrive/Master/research/ProtoMF/data/lfm2b-1mon/data_with_CLMR/train_data_with_features.csv",
+            'audio_feature_dim': 13  # 音源特徴量の次元
+        }
+    },
+}
+
 item_proto_chose_original_hyper_params = {
     **base_hyper_params,
     'loss_func_aggr': 'mean',
@@ -84,13 +131,39 @@ item_proto_chose_original_hyper_params = {
             'n_prototypes': tune.randint(10, 100),
             'cosine_type': 'shifted',
             'reg_proto_type': 'max',
-            'reg_batch_type': 'max'
+            'reg_batch_type': 'max',
         },
         'user_ft_ext_param': {
             "ft_type": "embedding",
         }
     },
 }
+
+item_proto_with_music_chose_original_hyper_params = {
+    **base_hyper_params,
+    'loss_func_aggr': 'mean',
+    'ft_ext_param': {
+        "ft_type": "prototypes",
+        'embedding_dim': tune.randint(10, 100),
+        'item_ft_ext_param': {
+            "ft_type": "prototypes",
+            'sim_proto_weight': tune.loguniform(1e-3, 10),
+            'sim_batch_weight': tune.loguniform(1e-3, 10),
+            'use_weight_matrix': False,
+            'n_prototypes': tune.randint(10, 100),
+            'cosine_type': 'shifted',
+            'reg_proto_type': 'max',
+            'reg_batch_type': 'max',
+            # 音源特徴を追加
+            'audio_features_path': "/content/drive/MyDrive/Master/research/ProtoMF/data/lfm2b-1mon/data_with_CLMR/train_data_with_features.csv",
+            'audio_feature_dim': 13,  # 音源特徴量の次元
+        },
+        'user_ft_ext_param': {
+            "ft_type": "embedding",
+        }
+    },
+}
+
 proto_double_tie_chose_original_hyper_params = {
     **base_hyper_params,
     'loss_func_aggr': 'mean',
@@ -99,6 +172,40 @@ proto_double_tie_chose_original_hyper_params = {
         'embedding_dim': tune.randint(10, 100),
         'item_ft_ext_param': {
             "ft_type": "prototypes_double_tie",
+            'sim_proto_weight': tune.loguniform(1e-3, 10),
+            'sim_batch_weight': tune.loguniform(1e-3, 10),
+            'use_weight_matrix': False,
+            'n_prototypes': tune.randint(10, 100),
+            'cosine_type': 'shifted',
+            'reg_proto_type': 'max',
+            'reg_batch_type': 'max'
+        },
+        'user_ft_ext_param': {
+            "ft_type": "prototypes_double_tie",
+            'sim_proto_weight': tune.loguniform(1e-3, 10),
+            'sim_batch_weight': tune.loguniform(1e-3, 10),
+            'use_weight_matrix': False,
+            'n_prototypes': tune.randint(10, 100),
+            'cosine_type': 'shifted',
+            'reg_proto_type': 'max',
+            'reg_batch_type': 'max'
+        },
+    },
+}
+
+proto_double_tie_with_music_chose_original_hyper_params = {
+    **base_hyper_params,
+    'loss_func_aggr': 'mean',
+    'ft_ext_param': {
+        "ft_type": "prototypes_double_tie",
+        'embedding_dim': tune.randint(10, 100),
+        'item_ft_ext_param': {
+            "ft_type": "prototypes_double_tie",
+
+            # 音源特徴を追加
+            'audio_features_path': "/content/drive/MyDrive/Master/research/ProtoMF/data/lfm2b-1mon/data_with_CLMR/train_data_with_features.csv",
+            'audio_feature_dim': 13,  # 音源特徴量の次元
+
             'sim_proto_weight': tune.loguniform(1e-3, 10),
             'sim_batch_weight': tune.loguniform(1e-3, 10),
             'use_weight_matrix': False,

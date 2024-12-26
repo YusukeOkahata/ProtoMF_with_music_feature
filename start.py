@@ -1,8 +1,9 @@
 import argparse
 import os
 
-from confs.hyper_params import mf_hyper_params, anchor_hyper_params, user_proto_chose_original_hyper_params, \
-    item_proto_chose_original_hyper_params, proto_double_tie_chose_original_hyper_params
+from confs.hyper_params import mf_hyper_params, mf_with_music_hyper_params, anchor_hyper_params, user_proto_chose_original_hyper_params, \
+    user_proto_with_music_chose_original_hyper_params, item_proto_chose_original_hyper_params, item_proto_with_music_chose_original_hyper_params, \
+    proto_double_tie_chose_original_hyper_params, proto_double_tie_with_music_chose_original_hyper_params
 from experiment_helper import start_hyper, start_multiple_hyper
 from utilities.consts import SINGLE_SEED
 
@@ -12,7 +13,7 @@ os.environ['OMP_NUM_THREADS'] = '1'
 parser = argparse.ArgumentParser(description='Start an experiment')
 
 parser.add_argument('--model', '-m', type=str, help='Recommender System model',
-                    choices=['mf', 'acf', 'user_proto', 'item_proto', 'user_item_proto'])
+                    choices=['mf', 'mf_with_music', 'acf', 'user_proto', 'user_proto_with_music', 'item_proto', 'item_proto_with_music', 'user_item_proto', 'user_item_proto_with_music'])
 
 parser.add_argument('--dataset', '-d', type=str, help='Recommender System Dataset',
                     choices=['amazon2014', 'ml-1m', 'lfm2b-1mon'])
@@ -33,14 +34,22 @@ seed = args.seed
 conf_dict = None
 if model == 'mf':
     conf_dict = mf_hyper_params
+elif model == 'mf_with_music':
+    conf_dict = mf_with_music_hyper_params
 elif model == 'acf':
     conf_dict = anchor_hyper_params
 elif model == 'user_proto':
     conf_dict = user_proto_chose_original_hyper_params
+elif model == 'user_proto_with_music':
+    conf_dict = user_proto_with_music_chose_original_hyper_params
 elif model == 'item_proto':
     conf_dict = item_proto_chose_original_hyper_params
+elif model == 'item_proto_with_music':
+    conf_dict = item_proto_with_music_chose_original_hyper_params
 elif model == 'user_item_proto':
     conf_dict = proto_double_tie_chose_original_hyper_params
+elif model == 'user_item_proto_with_music':
+    conf_dict = proto_double_tie_with_music_chose_original_hyper_params
 
 if multiple:
     start_multiple_hyper(conf_dict, model, dataset)
