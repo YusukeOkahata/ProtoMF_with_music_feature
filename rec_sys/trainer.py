@@ -1,25 +1,21 @@
 import os
-
 import torch
-from ray import tune
+import ray
+from ray import train
 from torch import nn
 from torch.utils import data
-
 from feature_extraction.feature_extractor_factories import FeatureExtractorFactory
 from rec_sys.rec_sys import RecSys
 from utilities.consts import OPTIMIZING_METRIC, MAX_PATIENCE
 from utilities.eval import Evaluator
-from utilities.explanations_utils import tsne_plot, get_top_k_items, weight_visualization
-
-
 
 class Trainer:
 
     def __init__(self, train_loader: data.DataLoader, val_loader: data.DataLoader, conf, save_path=None):
         """
         Train and Evaluate the model.
-        :param train_loader: Training DataLoader (check music4all_data.Music4AllDataset for more info)
-        :param val_loader: Validation DataLoader (check music4all_data.Music4AllDataset for more info)
+        :param train_loader: Training DataLoader
+        :param val_loader: Validation DataLoader
         :param conf: Experiment configuration parameters
         """
 
@@ -42,8 +38,8 @@ class Trainer:
         self.model = self._build_model()
         self.optimizer = self._build_optimizer()
 
-        self.save_path = save_path  # Google Driveの保存先パスをself.save_pathに保存
-
+        self.save_path = save_path  # Model save path
+        print("Model will be saved at: ", save_path)
         print(f'Built Trainer module \n'
               f'- n_epochs: {self.n_epochs} \n'
               f'- loss_func_name: {self.loss_func_name} \n'
@@ -94,7 +90,8 @@ class Trainer:
         """
         metrics_values = self.val()
         best_value = metrics_values[self.optimizing_metric]
-        tune.report(metrics_values)
+        # Initial report to track the starting point
+        train.report(metrics_values)
         print('Init - Avg Val Value {:.3f} \n'.format(best_value))
 
         patience = 0
@@ -129,31 +126,30 @@ class Trainer:
             metrics_values = self.val()
             curr_value = metrics_values[self.optimizing_metric]
             print('Epoch {} - Avg Val Value {:.3f} \n'.format(epoch, curr_value))
-            tune.report({**metrics_values, 'epoch_train_loss': epoch_train_loss})
+            
+            # Report the metrics for each epoch
+            metrics_values.update({'epoch_train_loss': epoch_train_loss})  # Add training loss
+            train.report(metrics_values)
 
             if curr_value > best_value:
                 best_value = curr_value
                 print('Epoch {} - New best model found (val value {:.3f}) \n'.format(epoch, curr_value))
 
-
-                # トライアルごとのパスにモデルを保存
+                # Save the model if it is the best one so far
                 if self.save_path:
                     model_save_path = os.path.join(self.save_path, 'best_model.pth')
-                    os.makedirs(self.save_path, exist_ok=True)  # 保存ディレクトリがない場合は作成
+                    os.makedirs(self.save_path, exist_ok=True)  # Create the directory if not exists
                     print(f"Saving model at: {model_save_path}")
 
-                    # モデル構造と重みを保存
-                    # torch.save(self.model.module, model_save_path)
-                    
-                    # モデルの重みのみを保存（推奨）
+                    # Save only model weights
                     torch.save(self.model.module.state_dict(), model_save_path)
-                    
-                    # 保存確認
+
+                    # Verify if the model was saved correctly
                     if os.path.exists(model_save_path):
                         print(f"Model saved successfully at: {model_save_path}")
                     else:
                         print("Error: Model file not found after saving attempt.")
-                        
+                
                 patience = 0
             else:
                 patience += 1
@@ -162,7 +158,7 @@ class Trainer:
     def val(self):
         """
         Runs the evaluation procedure.
-        :return: A scalar float value, output of the validation (e.g. NDCG@10).
+        :return: A dictionary with evaluation metrics (e.g., hit ratio, NDCG)
         """
         self.model.eval()
         print('Validation started')
@@ -184,7 +180,16 @@ class Trainer:
             eval.eval_batch(out)
 
         val_loss /= len(self.val_loader)
-        metrics_values = {**eval.get_results(), 'val_loss': val_loss}
 
+        # Debugging output for eval.get_results()
+        results = eval.get_results()
+        if results is None or not isinstance(results, dict):
+            raise ValueError(f"Invalid results from eval.get_results(): {results}")
 
+        # Debugging output for val_loss
+        if val_loss is None or not isinstance(val_loss, (float, int)):
+            raise ValueError(f"Invalid val_loss value: {val_loss}")
+
+        # Return the evaluation metrics as a dictionary, including validation loss
+        metrics_values = {**results, 'val_loss': val_loss}
         return metrics_values

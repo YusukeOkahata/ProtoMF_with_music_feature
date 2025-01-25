@@ -3,10 +3,13 @@ import os
 from typing import List
 
 import wandb
+from ray.air import RunConfig
+from ray.tune import TuneConfig
 from ray import tune
-from ray.tune.integration.wandb import WandbLoggerCallback
+from ray.air import session
+from ray.air.integrations.wandb import WandbLoggerCallback
 from ray.tune.schedulers import ASHAScheduler
-from ray.tune.suggest.hyperopt import HyperOptSearch
+from ray.tune.search.hyperopt import HyperOptSearch
 
 from rec_sys.protomf_dataset import get_protorecdataset_dataloader
 from rec_sys.tester import Tester
@@ -53,7 +56,7 @@ def load_data(conf: argparse.Namespace, is_train: bool = True):
         return {'test_loader': test_loader}
 
 
-def start_training(config, checkpoint_dir=None):
+def start_training(config, checkpoint_dir=None, trial_name=None):
     config = argparse.Namespace(**config)
     print(config)
 
@@ -61,13 +64,16 @@ def start_training(config, checkpoint_dir=None):
 
     reproducible(config.seed)
 
+    # trial_nameがconfigに含まれていない場合、Noneを返す
+    # trial_name = getattr(config, 'trial_name', None)  # get()の代わりにgetattr()を使用
+    
+    # トライアル名をセッションから取得
+    trial_name = session.get_trial_name()
+    print(f"Trial Name: {trial_name}")
 
-    # tune.get_trial_name()を直接呼び出してトライアル名を取得
-    trial_name = tune.get_trial_name()
     
     # Google Driveの保存先を指定
     save_path = f'/content/drive/MyDrive/Master/research/model/{trial_name}'
-
 
     trainer = Trainer(data_loaders_dict['train_loader'], data_loaders_dict['val_loader'], config, save_path=save_path)
 
@@ -117,17 +123,26 @@ def start_hyper(conf: dict, model: str, dataset: str, seed: int = SINGLE_SEED):
     conf['seed'] = seed
 
     group_name = f'{model}_{dataset}_{host_name}_{seed}'
+    
     tune.register_trainable(group_name, start_training)
+    trial_name=generate_id(prefix=group_name)
+
+    conf['trial_name'] = trial_name  # Add trial_name to config
+
+
     analysis = tune.run(
         group_name,
         config=conf,
-        name=generate_id(prefix=group_name),
+        name=trial_name,
         resources_per_trial={'gpu': GPU_PER_TRIAL, 'cpu': CPU_PER_TRIAL},
         scheduler=scheduler,
         search_alg=search_alg,
         num_samples=NUM_SAMPLES,
         callbacks=[callback],
-        metric='_metric/' + OPTIMIZING_METRIC,
+        # metric='_metric/' + OPTIMIZING_METRIC,
+        # 上記の記述方法がrayのバージョンアップにより使用できなくなったため、
+        # 監視したい評価指標を以下のように設定して下さい
+        metric="hit_ratio@10", 
         mode='max'
     )
     metric_name = '_metric/' + OPTIMIZING_METRIC
@@ -141,6 +156,7 @@ def start_hyper(conf: dict, model: str, dataset: str, seed: int = SINGLE_SEED):
     metric_values = start_testing(best_trial_config, best_trial_checkpoint)
     wandb.finish()
     return metric_values
+
 
 
 def start_multiple_hyper(conf: dict, model: str, dataset: str, seed_list: List = SEED_LIST):
